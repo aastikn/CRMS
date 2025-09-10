@@ -21,7 +21,7 @@ public class Order {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @Column(name = "order_amount", nullable = false, precision = 10, scale = 2)
+    @Column(name = "order_amount", nullable = false, precision = 10)
     private Double orderAmount;
 
     @Column(name = "order_date", nullable = false)

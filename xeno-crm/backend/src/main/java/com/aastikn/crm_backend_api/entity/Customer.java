@@ -27,7 +27,7 @@ public class Customer {
     @Column(length = 15)
     private String phone;
 
-    @Column(name = "total_spending", precision = 10, scale = 2)
+    @Column(name = "total_spending", precision = 10)
     private Double totalSpending = (Double) 0.0;
 
     @Column(name = "visit_count")
