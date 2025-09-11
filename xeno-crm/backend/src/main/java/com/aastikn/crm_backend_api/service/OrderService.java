@@ -4,7 +4,6 @@ import com.aastikn.crm_backend_api.dto.OrderDto;
 import com.aastikn.crm_backend_api.entity.Order;
 import com.aastikn.crm_backend_api.repository.CustomerRepository;
 import com.aastikn.crm_backend_api.repository.OrderRepository;
-import com.aastikn.crm_backend_api.service.MessageProducerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,16 +17,18 @@ public class OrderService {
     private final CustomerRepository customerRepository;
     private final MessageProducerService messageProducerService;
 
-    // Asynchronous creation via Redis Streams
+    private static final String ORDER_STREAM_KEY = "order:create";
+
+    // Asynchronous creation via Redis Pub/Sub
     public void createOrderAsync(OrderDto orderDto) {
         // A quick check to ensure the customer exists before publishing the event
         if (!customerRepository.existsById(orderDto.getCustomerId())) {
             throw new RuntimeException("Attempted to create order for non-existent customer: " + orderDto.getCustomerId());
         }
-        messageProducerService.publishOrderEvent(orderDto);
+        messageProducerService.addToStream(ORDER_STREAM_KEY, orderDto);
     }
 
-    // Synchronous read operations
+    // Synchronous read operations (No changes needed here)
     public Page<OrderDto> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable).map(this::convertToDto);
     }
@@ -38,6 +39,7 @@ public class OrderService {
         return convertToDto(order);
     }
 
+    // DTO Conversion (No changes needed here)
     private OrderDto convertToDto(Order order) {
         OrderDto dto = new OrderDto();
         dto.setId(order.getId());

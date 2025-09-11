@@ -20,17 +20,19 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final MessageProducerService messageProducerService;
 
-    // Asynchronous creation via Redis Streams
+    private static final String CUSTOMER_STREAM_KEY = "customer:create";
+
+    // Asynchronous creation via Redis Pub/Sub
     public void createCustomerAsync(CustomerDto customerDto) {
-        messageProducerService.publishCustomerEvent(customerDto);
+        messageProducerService.addToStream(CUSTOMER_STREAM_KEY, customerDto);
     }
 
     // Asynchronous bulk creation
     public void createCustomersAsync(List<CustomerDto> customerDtos) {
-        customerDtos.forEach(messageProducerService::publishCustomerEvent);
+        customerDtos.forEach(dto -> messageProducerService.addToStream(CUSTOMER_STREAM_KEY, dto));
     }
 
-    // Synchronous read operations
+    // Synchronous read operations (No changes needed here)
     public Page<CustomerDto> getAllCustomers(Pageable pageable) {
         return customerRepository.findAll(pageable).map(this::convertToDto);
     }
@@ -41,11 +43,11 @@ public class CustomerService {
         return convertToDto(customer);
     }
 
-    // Synchronous update and delete
+    // Synchronous update and delete (No changes needed here)
     @Transactional
     public CustomerDto updateCustomer(CustomerDto customerDto) {
         Customer existingCustomer = customerRepository.findById(customerDto.getId())
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerDto.getId()));
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: ".concat(String.valueOf(customerDto.getId()))));
 
         existingCustomer.setName(customerDto.getName());
         existingCustomer.setEmail(customerDto.getEmail());
@@ -63,9 +65,8 @@ public class CustomerService {
         customerRepository.deleteById(id);
     }
 
-    // Search functionality
+    // Search functionality (No changes needed here)
     public List<CustomerDto> searchCustomers(Double minSpending, Integer maxVisits, Integer inactiveDays) {
-        // This is a simplified search. A more complex implementation might use Specifications or Criteria API.
         if (minSpending != null) {
             return customerRepository.findByTotalSpendingGreaterThan(minSpending)
                     .stream().map(this::convertToDto).collect(Collectors.toList());
@@ -82,6 +83,7 @@ public class CustomerService {
         return List.of();
     }
 
+    // DTO Conversion (No changes needed here)
     private CustomerDto convertToDto(Customer customer) {
         CustomerDto dto = new CustomerDto();
         dto.setId(customer.getId());

@@ -25,7 +25,7 @@ public class SecurityConfig {
                         // IMPORTANT: Allow access to the Swagger UI paths
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         // Keep the rest of your API open for the assignment
-                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();

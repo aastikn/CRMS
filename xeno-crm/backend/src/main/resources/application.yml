@@ -52,8 +52,12 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
-    config-url: /api/v1/api-docs/swagger-config
-    url: /api/v1/api-docs
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    try-it-out-enabled: true
+  show-actuator: false
+
   info:
     title: CRM Backend API
     description: API documentation for the Xeno CRM application.
