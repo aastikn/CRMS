@@ -4,6 +4,18 @@ server:
     context-path: /api/v1
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 597088031575-nqsoc5a86925lfk4ctslarhnlhcvvjak.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+
+
   application:
     name: crm-backend-api
 
@@ -62,3 +74,9 @@ springdoc:
     title: CRM Backend API
     description: API documentation for the Xeno CRM application.
     version: v1.0.0
+app:
+  jwt:
+    secret: YOUR_SUPER_SECRET_KEY_THAT_IS_AT_LEAST_256_BITS_LONG
+    expiration-ms: 86400000 # 24 hours
+  oauth2:
+    redirect-uri: http://localhost:4200/login/callback # Your frontend callback URL
