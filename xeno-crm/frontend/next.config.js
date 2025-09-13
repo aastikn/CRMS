@@ -8,6 +8,16 @@ const { composePlugins, withNx } = require('@nx/next');
  **/
 const nextConfig = {
   nx: {},
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   async rewrites() {
     return [
       {

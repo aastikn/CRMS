@@ -24,9 +24,20 @@ export type Campaign = {
 
 export type CampaignHistoryItem = {
   id: string;
+  name: string;
   message: string;
   audienceSize: number;
   sentCount: number;
   failedCount: number;
+  createdAt: string; // ISO date string
+};
+
+export type Order = {
+  id: number;
+  customerId: number;
+  orderAmount: number;
+  orderDate: string; // ISO date string
+  status: string;
+  description: string;
   createdAt: string; // ISO date string
 };

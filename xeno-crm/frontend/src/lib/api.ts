@@ -1,4 +1,4 @@
-import { Audience, CampaignHistoryItem } from './types';
+import { Audience, CampaignHistoryItem, Order } from './types';
 
 const API_BASE_URL = '/api/v1';
 
@@ -52,4 +52,18 @@ export async function fetchCampaigns(): Promise<CampaignHistoryItem[]> {
 
     const result = await response.json();
     return result.data;
+}
+
+// Function to fetch past orders
+export async function fetchOrders(): Promise<Order[]> {
+    // Fetch recent orders, sorted by creation date
+    const response = await fetch(`${API_BASE_URL}/orders?sort=createdAt,desc&size=5`, { headers: getAuthHeaders() });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch orders');
+    }
+
+    const result = await response.json();
+    // The backend returns a pageable object, the data is in result.data.content
+    return result.data.content;
 }
