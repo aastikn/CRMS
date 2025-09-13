@@ -79,5 +79,4 @@ app:
     secret: ${JWT_SECRET_SPRINGBOOT}
     expiration-ms: 86400000 # 24 hours
   oauth2:
-    redirect-uri: https://google.com
-    # Your frontend callback URL
+    redirect-uri: http://localhost:3001/dashboard

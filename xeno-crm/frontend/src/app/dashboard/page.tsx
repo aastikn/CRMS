@@ -1,6 +1,21 @@
-import Link from 'next/link';
+'use client';
 
-export default function HomePage() {
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+
+export default function DashboardPage() {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      // In a real app, you'd also want to remove the token from the URL
+      // window.history.replaceState({}, document.title, "/dashboard");
+      localStorage.setItem('jwt_token', token);
+    }
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center">
