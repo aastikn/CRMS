@@ -21,3 +21,12 @@ export type Campaign = {
   name: string;
   message: string;
 };
+
+export type CampaignHistoryItem = {
+  id: string;
+  message: string;
+  audienceSize: number;
+  sentCount: number;
+  failedCount: number;
+  createdAt: string; // ISO date string
+};

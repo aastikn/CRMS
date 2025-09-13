@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Audience } from '../../../lib/types';
+import { Audience, Rule, RuleGroup as RuleGroupType } from '../../../lib/types';
 import { getAudienceSize, launchCampaign } from '../../../lib/api';
 import { AudienceBuilder } from '../../../components/AudienceBuilder';
 
@@ -21,8 +21,6 @@ const initialAudience: Audience = {
   ]
 }
 
-type EditorMode = 'visual' | 'text';
-
 export default function CreateCampaignPage() {
   const router = useRouter();
   const [audience, setAudience] = useState<Audience>(initialAudience);
@@ -30,7 +28,7 @@ export default function CreateCampaignPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [campaignName, setCampaignName] = useState('');
   const [campaignMessage, setCampaignMessage] = useState('');
-  const [editorMode, setEditorMode] = useState<EditorMode>('visual');
+  const [editorMode, setEditorMode] = useState<'visual' | 'text'>('visual');
   const [rawQuery, setRawQuery] = useState('(total_spending > 100) AND (visit_count < 5)');
 
   const handlePreview = async () => {
@@ -68,7 +66,7 @@ export default function CreateCampaignPage() {
     setIsLoading(true);
     const result = await launchCampaign(payload);
     if (result.success) {
-      router.push('/campaigns/history');
+      router.push('/campaigns');
     } else {
       alert('Failed to launch campaign.');
     }
@@ -81,7 +79,6 @@ export default function CreateCampaignPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Create New Campaign</h1>
 
         <div className="space-y-10">
-          {/* Campaign Details */}
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Campaign Details</h2>
             <div className="space-y-4">
@@ -102,7 +99,6 @@ export default function CreateCampaignPage() {
             </div>
           </div>
 
-          {/* Audience Rules */}
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Audience Rules</h2>
@@ -124,7 +120,6 @@ export default function CreateCampaignPage() {
             )}
           </div>
 
-          {/* Audience Preview */}
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Audience Preview</h2>
             <div className="flex items-center space-x-4">
@@ -137,20 +132,19 @@ export default function CreateCampaignPage() {
               </button>
               {audienceSize !== null && (
                 <p className="text-lg">
-                  Estimated Audience Size: <span className="font-bold">{audienceSize}</span> customers
+                  This campaign will be sent to <span className="font-bold">{audienceSize}</span> people.
                 </p>
               )}
             </div>
           </div>
 
-          {/* Launch */}
           <div className="flex justify-end">
             <button
               onClick={handleLaunch}
               disabled={isLoading || audienceSize === null}
               className="px-8 py-3 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 disabled:bg-gray-400"
             >
-              {isLoading ? 'Launching...' : 'Launch Campaign'}
+              {isLoading ? 'Launching...' : 'Save & Launch Campaign'}
             </button>
           </div>
         </div>

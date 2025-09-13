@@ -1,4 +1,4 @@
-import { Audience, Campaign, Rule, RuleGroup } from './types';
+import { Audience, Campaign, Rule, RuleGroup, CampaignHistoryItem } from './types';
 
 // Mock function to get audience size
 export async function getAudienceSize(payload: { audience?: Audience, rawQuery?: string }): Promise<{ count: number }> {
@@ -39,4 +39,40 @@ export async function launchCampaign(campaign: { name: string, message: string, 
       resolve({ success: true, campaignId: `camp_${Date.now()}` });
     }, 1000);
   });
+}
+
+// Mock function to fetch past campaigns
+export async function fetchCampaigns(): Promise<CampaignHistoryItem[]> {
+    console.log('Fetching campaigns...');
+    // In a real app, this would make a GET request to /api/v1/campaigns
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve([
+                {
+                    id: "camp_001",
+                    message: "Welcome back! Here's 10% off.",
+                    audienceSize: 210,
+                    sentCount: 200,
+                    failedCount: 10,
+                    createdAt: "2025-09-10T14:30:00Z"
+                },
+                {
+                    id: "camp_002",
+                    message: "Hi {name}, our new collection is here!",
+                    audienceSize: 850,
+                    sentCount: 845,
+                    failedCount: 5,
+                    createdAt: "2025-09-12T10:00:00Z"
+                },
+                {
+                    id: "camp_003",
+                    message: "Last chance for summer sales!",
+                    audienceSize: 1500,
+                    sentCount: 1450,
+                    failedCount: 50,
+                    createdAt: "2025-09-14T18:00:00Z"
+                }
+            ]);
+        }, 700);
+    });
 }
