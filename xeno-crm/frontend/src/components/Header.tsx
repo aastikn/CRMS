@@ -48,6 +48,7 @@ export function Header() {
             <div className="hidden md:flex items-center space-x-4">
               <Link href="/dashboard"><span className="font-semibold text-gray-600 hover:text-blue-600">Dashboard</span></Link>
               <Link href="/campaigns"><span className="font-semibold text-gray-600 hover:text-blue-600">Campaigns</span></Link>
+              <Link href="/orders"><span className="font-semibold text-gray-600 hover:text-blue-600">Orders</span></Link>
               <Link href="/customers"><span className="font-semibold text-gray-600 hover:text-blue-600">Customers</span></Link>
             </div>
           )}

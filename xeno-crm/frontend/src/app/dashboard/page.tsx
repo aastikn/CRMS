@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { RouteGuard } from '../../components/RouteGuard';
 import { CampaignHistoryItem, Order } from '../../lib/types';
-import { fetchCampaigns, fetchOrders } from '../../lib/api';
+import { fetchCampaigns, fetchRecentOrders } from '../../lib/api';
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
@@ -16,36 +16,32 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = searchParams.get('token');
-    if (token) {
-      localStorage.setItem('jwt_token', token);
+    const tokenFromUrl = searchParams.get('token');
+    if (tokenFromUrl) {
+      localStorage.setItem('jwt_token', tokenFromUrl);
       window.dispatchEvent(new Event('local-storage'));
       router.replace('/dashboard');
     }
-  }, [searchParams, router]);
 
-  useEffect(() => {
     async function loadDashboardData() {
-      const token = localStorage.getItem('jwt_token');
-      if (token) {
-        try {
-          setIsLoading(true);
-          const [campaignsData, ordersData] = await Promise.all([
-            fetchCampaigns(),
-            fetchOrders()
-          ]);
-          setCampaigns(campaignsData.slice(0, 5));
-          setOrders(ordersData);
-        } catch (error) {
-          console.error("Failed to load dashboard data", error);
-        } finally {
-          setIsLoading(false);
-        }
+      setIsLoading(true);
+      try {
+        const [campaignsData, ordersData] = await Promise.all([
+          fetchCampaigns(),
+          fetchRecentOrders(),
+        ]);
+        setCampaigns(campaignsData.slice(0, 5));
+        setOrders(ordersData);
+      } catch (error) {
+        console.error("Failed to load dashboard data", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
+    // The RouteGuard ensures a token exists, so we can always try to load data.
     loadDashboardData();
-  }, []);
+  }, [searchParams, router]);
 
   return (
     <RouteGuard>

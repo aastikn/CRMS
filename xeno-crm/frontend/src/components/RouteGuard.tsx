@@ -1,30 +1,24 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt_token');
-    if (!token) {
-      router.push('/');
-    } else {
+    const tokenFromStorage = localStorage.getItem('jwt_token');
+    const tokenFromUrl = searchParams.get('token');
+
+    if (tokenFromStorage || tokenFromUrl) {
       setIsAuthenticated(true);
+    } else {
+      router.push('/');
     }
-    setIsChecking(false);
-  }, [router]);
+  }, [router, searchParams]);
 
-  if (isChecking) {
-    return <div>Loading...</div>; // Or a spinner component
-  }
-
-  if (!isAuthenticated) {
-    return null; // Or a redirect message, though router.push should handle it
-  }
-
-  return <>{children}</>;
+  // Render children only when authenticated. A loading spinner could be returned here.
+  return isAuthenticated ? <>{children}</> : null;
 }

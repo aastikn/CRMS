@@ -9,6 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -37,6 +40,16 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         return convertToDto(order);
+    }
+
+    public List<OrderDto> getOrdersByCustomerId(Long customerId) {
+        if (!customerRepository.existsById(customerId)) {
+            throw new RuntimeException("Customer not found with id: " + customerId);
+        }
+        return orderRepository.findByCustomerId(customerId)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     // DTO Conversion (No changes needed here)

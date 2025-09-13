@@ -2,7 +2,9 @@ package com.aastikn.crm_backend_api.controller;
 
 import com.aastikn.crm_backend_api.dto.ApiResponse;
 import com.aastikn.crm_backend_api.dto.CustomerDto;
+import com.aastikn.crm_backend_api.dto.OrderDto;
 import com.aastikn.crm_backend_api.service.CustomerService;
+import com.aastikn.crm_backend_api.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final OrderService orderService;
 
     @PostMapping
     @Operation(summary = "Create a new customer",
@@ -52,6 +55,13 @@ public class CustomerController {
     public ResponseEntity<ApiResponse<CustomerDto>> getCustomerById(@PathVariable Long id) {
         CustomerDto customer = customerService.getCustomerById(id);
         return ResponseEntity.ok(ApiResponse.success(customer));
+    }
+
+    @GetMapping("/{id}/orders")
+    @Operation(summary = "Get all orders for a customer", description = "Retrieve list of orders for a specific customer")
+    public ResponseEntity<ApiResponse<List<OrderDto>>> getOrdersForCustomer(@PathVariable Long id) {
+        List<OrderDto> orders = orderService.getOrdersByCustomerId(id);
+        return ResponseEntity.ok(ApiResponse.success(orders));
     }
 
     @PutMapping("/{id}")

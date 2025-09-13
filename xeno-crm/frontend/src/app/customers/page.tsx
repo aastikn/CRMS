@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { fetchCustomers, searchCustomers } from '../../lib/api';
 import { Customer, PaginatedResponse } from '../../lib/types';
 import { RouteGuard } from '../../components/RouteGuard';
@@ -9,6 +10,7 @@ import { NewCustomerModal } from '../../components/NewCustomerModal';
 const DEBOUNCE_DELAY = 500;
 
 export default function CustomersPage() {
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [pageData, setPageData] = useState<PaginatedResponse<Customer> | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -180,7 +182,11 @@ export default function CustomersPage() {
                 </thead>
                 <tbody>
                   {customers.map(customer => (
-                    <tr key={customer.id} className="border-b">
+                    <tr 
+                      key={customer.id} 
+                      className="border-b hover:bg-gray-50 cursor-pointer"
+                      onClick={() => router.push(`/customers/${customer.id}`)}
+                    >
                       <td className="p-4">{customer.name}</td>
                       <td className="p-4">{customer.email}</td>
                       <td className="p-4">${customer.totalSpending.toFixed(2)}</td>
