@@ -1,4 +1,4 @@
-import { Audience, CampaignHistoryItem, Order } from './types';
+import { Audience, CampaignHistoryItem, Order, Customer, PaginatedResponse } from './types';
 
 const API_BASE_URL = '/api/v1';
 
@@ -66,4 +66,36 @@ export async function fetchOrders(): Promise<Order[]> {
     const result = await response.json();
     // The backend returns a pageable object, the data is in result.data.content
     return result.data.content;
+}
+
+// Function to fetch paginated customers
+export async function fetchCustomers(page: number, size: number): Promise<PaginatedResponse<Customer>> {
+  const query = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+    sort: 'createdAt,desc'
+  }).toString();
+  
+  const response = await fetch(`${API_BASE_URL}/customers?${query}`, { headers: getAuthHeaders() });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch customers');
+  }
+
+  const result = await response.json();
+  return result.data;
+}
+
+// Function to search for customers
+export async function searchCustomers(params: { [key: string]: any }): Promise<Customer[]> {
+  const query = new URLSearchParams(params).toString();
+  
+  const response = await fetch(`${API_BASE_URL}/customers/search?${query}`, { headers: getAuthHeaders() });
+
+  if (!response.ok) {
+    throw new Error('Failed to search customers');
+  }
+
+  const result = await response.json();
+  return result.data;
 }

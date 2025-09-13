@@ -41,3 +41,23 @@ export type Order = {
   description: string;
   createdAt: string; // ISO date string
 };
+
+export type Customer = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  totalSpending: number;
+  visitCount: number;
+  lastVisit: string; // ISO date string
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+};
+
+export type PaginatedResponse<T> = {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number; // current page number
+  size: number;
+};

@@ -40,9 +40,18 @@ export function Header() {
   return (
     <header className="bg-white shadow-sm">
       <nav className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <Link href="/">
-          <span className="text-2xl font-bold text-gray-800 cursor-pointer">Xeno CRM</span>
-        </Link>
+        <div className="flex items-center space-x-8">
+          <Link href="/">
+            <span className="text-2xl font-bold text-gray-800 cursor-pointer">Xeno CRM</span>
+          </Link>
+          {isLoggedIn && (
+            <div className="hidden md:flex items-center space-x-4">
+              <Link href="/dashboard"><span className="font-semibold text-gray-600 hover:text-blue-600">Dashboard</span></Link>
+              <Link href="/campaigns"><span className="font-semibold text-gray-600 hover:text-blue-600">Campaigns</span></Link>
+              <Link href="/customers"><span className="font-semibold text-gray-600 hover:text-blue-600">Customers</span></Link>
+            </div>
+          )}
+        </div>
         {isLoggedIn ? (
           <button
             onClick={handleLogout}
