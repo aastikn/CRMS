@@ -48,7 +48,6 @@ spring:
 logging:
   level:
     com.xeno.crm: DEBUG
-    org.springframework.data.redis: DEBUG
 
 management:
   endpoints:
@@ -77,6 +76,9 @@ app:
     expiration-ms: 86400000 # 24 hours
   oauth2:
     redirect-uri: http://localhost:3001/dashboard
+  cors:
+    allowed-origins:
+      - http://localhost:3001
   gemini:
     api:
       key: ${AI_API_KEY}

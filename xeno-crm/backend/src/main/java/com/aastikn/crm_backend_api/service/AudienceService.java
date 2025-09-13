@@ -1,10 +1,14 @@
 package com.aastikn.crm_backend_api.service;
 
 import com.aastikn.crm_backend_api.dto.AudiencePreviewRequest;
+import com.aastikn.crm_backend_api.dto.audience.AudienceDto;
 import com.aastikn.crm_backend_api.entity.Customer;
 import com.aastikn.crm_backend_api.repository.CustomerRepository;
+import com.aastikn.crm_backend_api.service.specification.CustomerSpecificationBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,35 +18,37 @@ import java.util.List;
 public class AudienceService {
 
     private final ObjectMapper objectMapper;
-    private final CustomerRepository customerRepository; // Add repository for fetching customers
+    private final CustomerRepository customerRepository;
 
-    // In a real application, this method would parse the audience or rawQuery
-    // and build a dynamic JPA query to count the customers.
-    // This is a complex task, so for now, we'll return a dummy value
-    // based on the complexity of the request.
     public long getAudienceSize(AudiencePreviewRequest request) {
-        if (request.getRawQuery() != null && !request.getRawQuery().isEmpty()) {
-            // Dummy logic for raw query
-            return Math.max(0, 1000 - (request.getRawQuery().length() * 5L));
+        if (request.getAudience() != null) {
+            CustomerSpecificationBuilder builder = new CustomerSpecificationBuilder();
+            Specification<Customer> spec = builder.build(request.getAudience());
+            return customerRepository.count(spec);
         }
 
-        if (request.getAudience() != null) {
-            // Dummy logic for structured audience object
-            try {
-                String audienceStr = objectMapper.writeValueAsString(request.getAudience());
-                return Math.max(0, 1000 - (audienceStr.length() / 2L));
-            } catch (Exception e) {
-                return 0;
-            }
+        if (request.getRawQuery() != null && !request.getRawQuery().isEmpty()) {
+            // For now, raw query is not supported for security reasons.
+            // A proper parser would be needed to safely handle this.
+            // Returning a dummy value for now to not break the frontend.
+            return Math.max(0, 1000 - (request.getRawQuery().length() * 5L));
         }
 
         return 0;
     }
 
-    // In a real application, this method would parse the rules JSON and build a dynamic query.
-    // For this example, we'll just return all customers.
     public List<Customer> getAudience(String rulesJson) {
-        // TODO: Implement dynamic query based on rulesJson
-        return customerRepository.findAll();
+        try {
+            AudienceDto audienceDto = objectMapper.readValue(rulesJson, AudienceDto.class);
+            CustomerSpecificationBuilder builder = new CustomerSpecificationBuilder();
+            Specification<Customer> spec = builder.build(audienceDto);
+            if (spec != null) {
+                return customerRepository.findAll(spec);
+            }
+        } catch (JsonProcessingException e) {
+            // Log the error
+            return List.of();
+        }
+        return customerRepository.findAll(); // Fallback or throw exception
     }
 }
