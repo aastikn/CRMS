@@ -9,8 +9,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 597088031575-nqsoc5a86925lfk4ctslarhnlhcvvjak.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
               - email
               - profile
@@ -76,7 +76,8 @@ springdoc:
     version: v1.0.0
 app:
   jwt:
-    secret: YOUR_SUPER_SECRET_KEY_THAT_IS_AT_LEAST_256_BITS_LONG
+    secret: ${JWT_SECRET_SPRINGBOOT}
     expiration-ms: 86400000 # 24 hours
   oauth2:
-    redirect-uri: http://localhost:4200/login/callback # Your frontend callback URL
+    redirect-uri: https://google.com
+    # Your frontend callback URL
