@@ -17,7 +17,10 @@ export async function getAudienceSize(payload: { audience?: Audience, rawQuery?:
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
   });
-  if (!response.ok) throw new Error('Failed to fetch audience size');
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Failed to fetch audience size' }));
+    throw new Error(errorData.message || 'Failed to fetch audience size');
+  }
   const result = await response.json();
   return { count: result.data };
 }

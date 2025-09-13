@@ -69,11 +69,17 @@ public class ReceiptUpdateConsumer implements StreamListener<String, MapRecord<S
 
         if (!sentIds.isEmpty()) {
             logRepository.updateStatusForIds(CommunicationLog.Status.SENT, sentIds);
-            // TODO: Increment campaign sentCount in bulk
+            List<Object[]> sentCounts = logRepository.countByCampaignId(sentIds);
+            for (Object[] row : sentCounts) {
+                campaignRepository.updateCounts((Long) row[0], ((Long) row[1]).intValue(), 0);
+            }
         }
         if (!failedIds.isEmpty()) {
             logRepository.updateStatusForIds(CommunicationLog.Status.FAILED, failedIds);
-            // TODO: Increment campaign failedCount in bulk
+            List<Object[]> failedCounts = logRepository.countByCampaignId(failedIds);
+            for (Object[] row : failedCounts) {
+                campaignRepository.updateCounts((Long) row[0], 0, ((Long) row[1]).intValue());
+            }
         }
     }
 }

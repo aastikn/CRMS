@@ -52,9 +52,6 @@ public class CampaignConsumer implements StreamListener<String, MapRecord<String
             campaign.setAudienceSize(audience.size());
             campaignRepository.save(campaign);
 
-            int sentCount = 0;
-            int failedCount = 0;
-
             // 2. Create logs and call vendor for each customer
             for (Customer customer : audience) {
                 try {
@@ -66,23 +63,12 @@ public class CampaignConsumer implements StreamListener<String, MapRecord<String
 
                     // 3. Simulate sending the message via the vendor
                     vendorApiService.sendMessage(log, campaign.getMessage());
-
-                    // If vendor call is successful, update log
-                    log.setStatus(CommunicationLog.Status.SENT);
-                    communicationLogRepository.save(log);
-                    sentCount++;
                 } catch (Exception e) {
                     log.error("Failed to process message for customer {} in campaign {}", customer.getId(), campaignId, e);
-                    failedCount++;
                 }
             }
 
-            campaign.setSentCount(sentCount);
-            campaign.setFailedCount(failedCount);
-            campaign.setStatus(Campaign.CampaignStatus.COMPLETED);
-            campaignRepository.save(campaign);
-
-            log.info("Finished processing campaignId: {}. Sent: {}, Failed: {}", campaignId, sentCount, failedCount);
+            log.info("Finished dispatching messages for campaignId: {}.", campaignId);
 
         } catch (Exception e) {
             log.error("Error processing campaign launch event: {}", message, e);

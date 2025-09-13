@@ -8,13 +8,17 @@ import com.aastikn.crm_backend_api.service.specification.CustomerSpecificationBu
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AudienceService {
 
     private final ObjectMapper objectMapper;
@@ -28,10 +32,14 @@ public class AudienceService {
         }
 
         if (request.getRawQuery() != null && !request.getRawQuery().isEmpty()) {
-            // For now, raw query is not supported for security reasons.
-            // A proper parser would be needed to safely handle this.
-            // Returning a dummy value for now to not break the frontend.
-            return Math.max(0, 1000 - (request.getRawQuery().length() * 5L));
+            try {
+                RawQueryParser parser = new RawQueryParser();
+                Specification<Customer> spec = parser.parse(request.getRawQuery());
+                return customerRepository.count(spec);
+            } catch (Exception e) {
+                log.error("Failed to parse raw query: {}", request.getRawQuery(), e);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid raw query: " + e.getMessage(), e);
+            }
         }
 
         return 0;
@@ -46,7 +54,7 @@ public class AudienceService {
                 return customerRepository.findAll(spec);
             }
         } catch (JsonProcessingException e) {
-            // Log the error
+            log.error("Failed to parse audience rules: {}", rulesJson, e);
             return List.of();
         }
         return customerRepository.findAll(); // Fallback or throw exception

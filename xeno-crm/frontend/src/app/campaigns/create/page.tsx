@@ -33,13 +33,19 @@ export default function CreateCampaignPage() {
   const [messageSuggestions, setMessageSuggestions] = useState<MessageSuggestion[]>([]);
   const [editorMode, setEditorMode] = useState<'visual' | 'text'>('visual');
   const [rawQuery, setRawQuery] = useState('(total_spending > 100) AND (visit_count < 5)');
+  const [error, setError] = useState<string | null>(null);
 
   const handlePreview = async () => {
     setIsLoading(true);
     setAudienceSize(null);
-    const payload = editorMode === 'visual' ? { audience } : { rawQuery };
-    const data = await getAudienceSize(payload);
-    setAudienceSize(data.count);
+    setError(null);
+    try {
+        const payload = editorMode === 'visual' ? { audience } : { rawQuery };
+        const data = await getAudienceSize(payload);
+        setAudienceSize(data.count);
+    } catch (e: any) {
+        setError(e.message);
+    }
     setIsLoading(false);
   };
 
@@ -201,6 +207,9 @@ export default function CreateCampaignPage() {
                 </p>
               )}
             </div>
+            {error && (
+                <p className="text-red-500 text-sm mt-2">{error}</p>
+            )}
           </div>
 
           <div className="flex justify-end">
@@ -217,4 +226,3 @@ export default function CreateCampaignPage() {
     </div>
   );
 }
-

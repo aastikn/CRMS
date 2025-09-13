@@ -15,4 +15,7 @@ public interface CommunicationLogRepository extends JpaRepository<CommunicationL
     @Modifying
     @Query("UPDATE CommunicationLog cl SET cl.status = :status WHERE cl.id IN :ids")
     void updateStatusForIds(@Param("status") CommunicationLog.Status status, @Param("ids") List<Long> ids);
+
+    @Query("SELECT cl.campaign.id, COUNT(cl.id) FROM CommunicationLog cl WHERE cl.id IN :ids GROUP BY cl.campaign.id")
+    List<Object[]> countByCampaignId(@Param("ids") List<Long> ids);
 }
