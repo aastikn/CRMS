@@ -32,6 +32,11 @@ export type CampaignHistoryItem = {
   createdAt: string; // ISO date string
 };
 
+export type MessageSuggestion = {
+  message: string;
+  imageSuggestion: string;
+};
+
 export type Order = {
   id: number;
   customerId: number;

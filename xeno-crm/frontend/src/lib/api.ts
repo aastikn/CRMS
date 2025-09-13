@@ -129,6 +129,20 @@ export async function generateQueryFromPrompt(prompt: string): Promise<{ query: 
   return result.data;
 }
 
+export async function generateMessagesFromObjective(objective: string): Promise<MessageSuggestion[]> {
+  const response = await fetch(`${API_BASE_URL}/ai/generate-messages`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ objective }),
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Failed to generate messages from AI' }));
+    throw new Error(errorData.message);
+  }
+  const result = await response.json();
+  return result.data.messages;
+}
+
 export async function createCustomersBulk(customers: Partial<Customer>[]): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/customers/bulk`, {
     method: 'POST',
