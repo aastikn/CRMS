@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { fetchCustomers, searchCustomers } from '../../lib/api';
 import { Customer, PaginatedResponse } from '../../lib/types';
 import { RouteGuard } from '../../components/RouteGuard';
+import { NewCustomerModal } from '../../components/NewCustomerModal';
 
 const DEBOUNCE_DELAY = 500;
 
@@ -13,6 +14,7 @@ export default function CustomersPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     minSpending: '',
@@ -78,6 +80,14 @@ export default function CustomersPage() {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCreationSuccess = () => {
+    // Reset to the first page and reload customers
+    setCurrentPage(0);
+    setIsSearching(false); // Exit search mode if active
+    setFilters({ minSpending: '', maxVisits: '', inactiveDays: '' }); // Reset filters
+    loadCustomers(0);
+  };
+
   const renderPagination = () => {
     if (!pageData || isSearching) return null;
 
@@ -106,9 +116,22 @@ export default function CustomersPage() {
 
   return (
     <RouteGuard>
+      <NewCustomerModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSuccess={handleCreationSuccess} 
+      />
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Customers</h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 cursor-pointer"
+            >
+              + New Customer
+            </button>
+          </div>
 
           {/* Search and Filter Section */}
           <div className="bg-white p-6 rounded-lg shadow mb-8">

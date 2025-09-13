@@ -99,3 +99,35 @@ export async function searchCustomers(params: { [key: string]: any }): Promise<C
   const result = await response.json();
   return result.data;
 }
+
+// Function to create a single customer
+export async function createCustomer(customer: Partial<Customer>): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/customers`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(customer),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Failed to create customer' }));
+    throw new Error(errorData.message);
+  }
+
+  return response.json();
+}
+
+// Function to create customers in bulk
+export async function createCustomersBulk(customers: Partial<Customer>[]): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/customers/bulk`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(customers),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Failed to import customers' }));
+    throw new Error(errorData.message);
+  }
+
+  return response.json();
+}
