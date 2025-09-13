@@ -1,6 +1,8 @@
 {
   "files": [],
-  "include": [],
+  "include": [
+    ".next/types/**/*.ts"
+  ],
   "references": [
     {
       "path": "./tsconfig.app.json"
@@ -10,5 +12,22 @@
     }
   ],
   "extends": "../tsconfig.base.json",
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": [
+    "jest.config.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ],
+  "compilerOptions": {
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  }
 }
