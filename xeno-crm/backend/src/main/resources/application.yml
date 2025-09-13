@@ -15,7 +15,6 @@ spring:
               - email
               - profile
 
-
   application:
     name: crm-backend-api
 
@@ -46,7 +45,6 @@ spring:
         max-wait: -1ms
       shutdown-timeout: 2000ms
 
-
 logging:
   level:
     com.xeno.crm: DEBUG
@@ -57,7 +55,6 @@ management:
     web:
       exposure:
         include: health,info,metrics
-
 
 springdoc:
   api-docs:
@@ -80,3 +77,6 @@ app:
     expiration-ms: 86400000 # 24 hours
   oauth2:
     redirect-uri: http://localhost:3001/dashboard
+  gemini:
+    api:
+      key: ${AI_API_KEY}

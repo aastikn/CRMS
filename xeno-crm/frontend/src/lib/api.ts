@@ -115,6 +115,20 @@ export async function createCustomer(customer: Partial<Customer>): Promise<any> 
   return response.json();
 }
 
+export async function generateQueryFromPrompt(prompt: string): Promise<{ query: string }> {
+  const response = await fetch(`${API_BASE_URL}/ai/generate-query`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ prompt }),
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Failed to generate query from AI' }));
+    throw new Error(errorData.message);
+  }
+  const result = await response.json();
+  return result.data;
+}
+
 export async function createCustomersBulk(customers: Partial<Customer>[]): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/customers/bulk`, {
     method: 'POST',
