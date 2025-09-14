@@ -1,5 +1,5 @@
 server:
-  port: 3000
+  port: 8080
   servlet:
     context-path: /api/v1
 
@@ -75,10 +75,10 @@ app:
     secret: ${JWT_SECRET_SPRINGBOOT}
     expiration-ms: 86400000 # 24 hours
   oauth2:
-    redirect-uri: http://localhost:3001/dashboard
+    redirect-uri: http://localhost:3000/dashboard
   cors:
     allowed-origins:
-      - http://localhost:3001
+      - http://localhost:3000
   gemini:
     api:
       key: ${AI_API_KEY}

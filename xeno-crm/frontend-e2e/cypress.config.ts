@@ -11,8 +11,8 @@ export default defineConfig({
         production: 'npx nx run @xeno-crm/frontend:preview',
       },
       ciWebServerCommand: 'npx nx run @xeno-crm/frontend:preview',
-      ciBaseUrl: 'http://localhost:4200',
+      ciBaseUrl: 'http://localhost:3000',
     }),
-    baseUrl: 'http://localhost:4200',
+    baseUrl: 'http://localhost:3000',
   },
-});
+declare global {
