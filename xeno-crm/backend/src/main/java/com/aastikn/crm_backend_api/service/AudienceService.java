@@ -47,16 +47,27 @@ public class AudienceService {
 
     public List<Customer> getAudience(String rulesJson) {
         try {
-            AudienceDto audienceDto = objectMapper.readValue(rulesJson, AudienceDto.class);
-            CustomerSpecificationBuilder builder = new CustomerSpecificationBuilder();
-            Specification<Customer> spec = builder.build(audienceDto);
-            if (spec != null) {
+            var ruleNode = objectMapper.readTree(rulesJson);
+            if (ruleNode.has("rawQuery")) {
+                String rawQuery = ruleNode.get("rawQuery").asText();
+                RawQueryParser parser = new RawQueryParser();
+                Specification<Customer> spec = parser.parse(rawQuery);
                 return customerRepository.findAll(spec);
+            } else {
+                AudienceDto audienceDto = objectMapper.treeToValue(ruleNode, AudienceDto.class);
+                CustomerSpecificationBuilder builder = new CustomerSpecificationBuilder();
+                Specification<Customer> spec = builder.build(audienceDto);
+                if (spec != null) {
+                    return customerRepository.findAll(spec);
+                }
             }
         } catch (JsonProcessingException e) {
             log.error("Failed to parse audience rules: {}", rulesJson, e);
             return List.of();
+        } catch (Exception e) {
+            log.error("Failed to build audience from rules: {}", rulesJson, e);
+            return List.of();
         }
-        return customerRepository.findAll(); // Fallback or throw exception
+        return List.of();
     }
 }

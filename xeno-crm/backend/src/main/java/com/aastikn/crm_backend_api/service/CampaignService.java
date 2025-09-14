@@ -22,7 +22,7 @@ public class CampaignService {
     private final MessageProducerService messageProducerService;
     private final ObjectMapper objectMapper;
 
-    public static final String CAMPAIGN_LAUNCH_STREAM_KEY = "campaign:launch";
+    public static final String CAMPAIGN_LAUNCH_CHANNEL = "campaign:launch";
 
     @Transactional
     public Campaign createCampaign(CampaignCreateRequest request) {
@@ -47,8 +47,8 @@ public class CampaignService {
         campaign.setMessage(request.getMessage());
         Campaign savedCampaign = campaignRepository.save(campaign);
 
-        // Use the existing addToStream method for consistency
-        messageProducerService.addToStream(CAMPAIGN_LAUNCH_STREAM_KEY, savedCampaign.getId());
+        // PUBLISH the ID to trigger the delivery process
+        messageProducerService.publish(CAMPAIGN_LAUNCH_CHANNEL, savedCampaign.getId());
 
         return savedCampaign;
     }

@@ -1,5 +1,9 @@
 package com.aastikn.crm_backend_api.config;
 
+import com.aastikn.crm_backend_api.consumer.CampaignDeliveryConsumer;
+import com.aastikn.crm_backend_api.consumer.ReceiptUpdateConsumer;
+import com.aastikn.crm_backend_api.controller.DeliveryReceiptController;
+import com.aastikn.crm_backend_api.service.CampaignService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -9,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -45,4 +51,19 @@ public class RedisConfig {
         return template;
     }
 
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory connectionFactory,
+            CampaignDeliveryConsumer campaignDeliveryConsumer,
+            ReceiptUpdateConsumer receiptUpdateConsumer) {
+
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+
+        container.addMessageListener(campaignDeliveryConsumer, new ChannelTopic(CampaignService.CAMPAIGN_LAUNCH_CHANNEL));
+        container.addMessageListener(receiptUpdateConsumer, new ChannelTopic(DeliveryReceiptController.RECEIPT_UPDATE_CHANNEL));
+
+        log.info("Redis pub/sub message listener container configured");
+        return container;
+    }
 }

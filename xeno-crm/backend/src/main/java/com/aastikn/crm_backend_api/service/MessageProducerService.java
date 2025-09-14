@@ -33,4 +33,14 @@ public class MessageProducerService {
             log.error("Error adding message to stream '{}'", streamKey, e);
         }
     }
+
+    public void publish(String channel, Object message) {
+        try {
+            log.info("Publishing message to Redis channel '{}'", channel);
+            redisTemplate.convertAndSend(channel, message);
+            log.info("Message published successfully to channel '{}'", channel);
+        } catch (Exception e) {
+            log.error("Error publishing message to channel '{}'", channel, e);
+        }
+    }
 }

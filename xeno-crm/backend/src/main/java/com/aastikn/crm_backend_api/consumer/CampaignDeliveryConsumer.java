@@ -10,17 +10,16 @@ import com.aastikn.crm_backend_api.service.VendorApiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.data.redis.stream.StreamListener;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class CampaignConsumer implements StreamListener<String, MapRecord<String, String, String>> {
+public class CampaignDeliveryConsumer implements MessageListener {
 
     private final CampaignRepository campaignRepository;
     private final AudienceService audienceService;
@@ -29,21 +28,12 @@ public class CampaignConsumer implements StreamListener<String, MapRecord<String
     private final ObjectMapper objectMapper;
 
     @Override
-    @Transactional
-    public void onMessage(MapRecord<String, String, String> message) {
+    public void onMessage(Message message, byte[] pattern) {
         try {
-            String campaignIdStr = message.getValue().get("data");
-            Long campaignId = Long.parseLong(campaignIdStr);
+            Long campaignId = objectMapper.readValue(message.getBody(), Long.class);
             log.info("Received campaign launch event for campaignId: {}", campaignId);
 
-            Campaign campaign = campaignRepository.findById(campaignId)
-                    .orElseThrow(() -> new RuntimeException("Campaign not found: " + campaignId));
-
-            if (campaign.getStatus() != Campaign.CampaignStatus.PENDING) {
-                log.warn("Campaign {} is already being processed or is completed.", campaignId);
-                return;
-            }
-
+            Campaign campaign = campaignRepository.findById(campaignId).orElseThrow();
             campaign.setStatus(Campaign.CampaignStatus.IN_PROGRESS);
             campaignRepository.save(campaign);
 
@@ -51,25 +41,20 @@ public class CampaignConsumer implements StreamListener<String, MapRecord<String
             List<Customer> audience = audienceService.getAudience(campaign.getSegment().getRules());
             campaign.setAudienceSize(audience.size());
             campaignRepository.save(campaign);
-            log.info("calling vendor service to send onmessage cc");
+            log.info("calling vendor service to send onmessage cdc");
             // 2. Create logs and call vendor for each customer
             for (Customer customer : audience) {
-                // Create the initial log entry
                 CommunicationLog log = new CommunicationLog();
                 log.setCampaign(campaign);
                 log.setCustomer(customer);
                 log.setStatus(CommunicationLog.Status.PENDING);
                 CommunicationLog savedLog = communicationLogRepository.save(log);
-
-                // Call the vendor simulation to "send" the message
+                // 3. Simulate sending the message via the vendor
                 vendorApiService.sendMessage(savedLog, campaign.getMessage());
             }
 
-            log.info("Finished dispatching messages for campaignId: {}.", campaignId);
-
         } catch (Exception e) {
-            log.error("Error processing campaign launch event: {}", message, e);
-            // Here you might want to find the campaign and set its status to FAILED
+            log.error("Error processing campaign launch event", e);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.aastikn.crm_backend_api.service;
 
-import com.aastikn.crm_backend_api.entity.CommunicationLog;
 import com.aastikn.crm_backend_api.dto.DeliveryReceiptDto;
+import com.aastikn.crm_backend_api.entity.CommunicationLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,27 +11,25 @@ import org.springframework.web.client.RestTemplate;
 public class VendorApiService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final String receiptWebhookUrl = "http://localhost:3000/api/v1/receipts"; // URL to your own backend
 
-    // The URL of our own backend's receipt endpoint
-    private final String receiptWebhookUrl = "http://localhost:3000/api/v1/receipts";
+    public void sendMessage(CommunicationLog communicationLog, String messageTemplate) {
+        // Personalize the message as required [cite: 32]
+        String personalizedMessage = messageTemplate.replace("{name}", communicationLog.getCustomer().getName());
+        log.info("VENDOR_API_SIM: Sending message to {}: '{}'", communicationLog.getCustomer().getEmail(), personalizedMessage);
 
-    public void sendMessage(CommunicationLog communicationLog, String baseMessage) {
-        // Personalize the message (assuming {name} placeholder exists in baseMessage)
-        String personalizedMessage = baseMessage.replace("{name}", communicationLog.getCustomer().getName() != null ? communicationLog.getCustomer().getName() : "Customer");
-        log.info("Simulating sending message to {}: {}", communicationLog.getCustomer().getEmail(), personalizedMessage);
-        
-        // Simulate success/failure
-        CommunicationLog.Status status = Math.random() < 0.9 ? CommunicationLog.Status.SENT : CommunicationLog.Status.FAILED;
-        
-        // Prepare the receipt to send back
-        DeliveryReceiptDto receipt = new DeliveryReceiptDto(communicationLog.getId(), status.name());
-        
-        // Simulate calling our own webhook
+        // Simulate success/failure (~90% SENT, ~10% FAILED) [cite: 33]
+        String status = Math.random() < 0.9 ? "SENT" : "FAILED";
+
+        DeliveryReceiptDto receipt = new DeliveryReceiptDto(communicationLog.getId(), status);
+
+        // Hit the delivery receipt API on your backend [cite: 34]
         try {
+            // This makes an HTTP POST request to your own DeliveryReceiptController
             restTemplate.postForEntity(receiptWebhookUrl, receipt, String.class);
-            log.info("Delivery receipt sent for logId: {} with status: {}", communicationLog.getId(), status.name());
+            log.info("VENDOR_API_SIM: Sent delivery receipt for logId: {} with status: {}", communicationLog.getId(), status);
         } catch (Exception e) {
-            log.error("Failed to send delivery receipt for logId: {}", communicationLog.getId(), e);
+            log.error("VENDOR_API_SIM: Failed to send delivery receipt for logId: {}", communicationLog.getId(), e);
         }
     }
 }
