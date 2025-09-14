@@ -1,5 +1,6 @@
 package com.aastikn.crm_backend_api.repository;
 
+import com.aastikn.crm_backend_api.dto.CampaignCountsDto;
 import com.aastikn.crm_backend_api.entity.CommunicationLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,4 +19,14 @@ public interface CommunicationLogRepository extends JpaRepository<CommunicationL
 
     @Query("SELECT cl.campaign.id, COUNT(cl.id) FROM CommunicationLog cl WHERE cl.id IN :ids GROUP BY cl.campaign.id")
     List<Object[]> countByCampaignId(@Param("ids") List<Long> ids);
+
+    @Query("SELECT new com.aastikn.crm_backend_api.dto.CampaignCountsDto(" +
+            "cl.campaign.id, " +
+            "SUM(CASE WHEN cl.status = 'SENT' THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN cl.status = 'FAILED' THEN 1 ELSE 0 END)) " +
+            "FROM CommunicationLog cl " +
+            "WHERE cl.id IN :ids " +
+            "GROUP BY cl.campaign.id")
+    List<CampaignCountsDto> getCampaignCountsForLogIds(@Param("ids") List<Long> ids);
+
 }

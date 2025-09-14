@@ -15,6 +15,8 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,36 +29,54 @@ public class CampaignDeliveryConsumer implements MessageListener {
     private final VendorApiService vendorApiService;
     private final ObjectMapper objectMapper;
 
+    // In CampaignDeliveryConsumer.java
+
+    // In CampaignDeliveryConsumer.java
+
     @Override
     public void onMessage(Message message, byte[] pattern) {
+        Long campaignId = null;
         try {
-            Long campaignId = objectMapper.readValue(message.getBody(), Long.class);
+            campaignId = objectMapper.readValue(message.getBody(), Long.class);
             log.info("Received campaign launch event for campaignId: {}", campaignId);
 
-            Campaign campaign = campaignRepository.findById(campaignId).orElseThrow();
+            Campaign campaign = null;
+            // Retry fetching the campaign up to 3 times
+            for (int i = 0; i < 3; i++) {
+                Optional<Campaign> campaignOptional = campaignRepository.findById(campaignId);
+                if (campaignOptional.isPresent()) {
+                    campaign = campaignOptional.get();
+                    break;
+                }
+                // Wait for 100ms before retrying
+                Thread.sleep(100);
+            }
+
+            if (campaign == null) {
+                // If it's still not found after retries, throw an exception.
+                throw new NoSuchElementException("Campaign not found after retries for ID: " + campaignId);
+            }
+
             campaign.setStatus(Campaign.CampaignStatus.IN_PROGRESS);
             campaignRepository.save(campaign);
 
-            // 1. Find the audience
             List<Customer> audience = audienceService.getAudience(campaign.getSegment().getRules());
             campaign.setAudienceSize(audience.size());
             campaignRepository.save(campaign);
-            log.info("calling vendor service to send onmessage cdc");
-            // 2. Create logs and call vendor for each customer
-//            log.info("savedLog for first is {}, and cgm is {}",audience.stream().findFirst());
+
             for (Customer customer : audience) {
                 CommunicationLog log = new CommunicationLog();
                 log.setCampaign(campaign);
+
                 log.setCustomer(customer);
                 log.setStatus(CommunicationLog.Status.PENDING);
                 CommunicationLog savedLog = communicationLogRepository.save(log);
-                // 3. Simulate sending the message via the vendor
 
                 vendorApiService.sendMessage(savedLog, campaign.getMessage());
             }
 
         } catch (Exception e) {
-            log.error("Error processing campaign launch event", e);
+            log.error("Error processing campaign launch event for campaignId: {}", campaignId, e);
         }
     }
 }
