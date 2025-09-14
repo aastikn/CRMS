@@ -33,6 +33,20 @@ export type CampaignHistoryItem = {
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
 };
 
+export type CommunicationLog = {
+  id: string;
+  customer: {
+    id: string;
+    name: string;
+  };
+  campaign: {
+    name: string;
+  };
+  sent_at: string;
+  message: string;
+  status: 'SENT' | 'FAILED';
+};
+
 export type MessageSuggestion = {
   message: string;
   imageSuggestion: string;
