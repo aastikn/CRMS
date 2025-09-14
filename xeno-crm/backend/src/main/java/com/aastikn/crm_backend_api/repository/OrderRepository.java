@@ -23,4 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT COUNT(o) FROM Order o WHERE o.customer.id = :customerId")
     Long getOrderCountByCustomer(@Param("customerId") Long customerId);
+
+    @Query("SELECT FUNCTION('DATE', o.orderDate), COUNT(o.id) FROM Order o WHERE o.orderDate >= :since GROUP BY FUNCTION('DATE', o.orderDate) ORDER BY FUNCTION('DATE', o.orderDate)")
+    List<Object[]> countOrdersByDay(@Param("since") LocalDateTime since);
 }

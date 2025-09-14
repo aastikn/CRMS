@@ -27,4 +27,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
 
     @Query("SELECT COUNT(c) FROM Customer c WHERE c.totalSpending > :amount AND c.visitCount < :visits")
     Long countBySpendingAndVisits(@Param("amount") Double amount, @Param("visits") Integer visits);
+
+    @Query("SELECT FUNCTION('DATE', c.createdAt), COUNT(c.id) FROM Customer c WHERE c.createdAt >= :since GROUP BY FUNCTION('DATE', c.createdAt) ORDER BY FUNCTION('DATE', c.createdAt)")
+    List<Object[]> countCustomersByDay(@Param("since") LocalDateTime since);
 }

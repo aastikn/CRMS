@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { RouteGuard } from '../../components/RouteGuard';
-import { CampaignHistoryItem, Order } from '../../lib/types';
-import { fetchCampaigns, fetchRecentOrders } from '../../lib/api';
+import { CampaignHistoryItem, Order, AnalyticsDataPoint } from '../../lib/types';
+import { fetchCampaigns, fetchRecentOrders, fetchOrdersByDay, fetchUsersByDay } from '../../lib/api';
+import { LineChart } from '../../components/LineChart';
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
@@ -13,6 +14,8 @@ export default function DashboardPage() {
 
   const [campaigns, setCampaigns] = useState<CampaignHistoryItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersByDay, setOrdersByDay] = useState<AnalyticsDataPoint[]>([]);
+  const [usersByDay, setUsersByDay] = useState<AnalyticsDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -26,12 +29,16 @@ export default function DashboardPage() {
     async function loadDashboardData() {
       setIsLoading(true);
       try {
-        const [campaignsData, ordersData] = await Promise.all([
+        const [campaignsData, ordersData, ordersByDayData, usersByDayData] = await Promise.all([
           fetchCampaigns(),
           fetchRecentOrders(),
+          fetchOrdersByDay(),
+          fetchUsersByDay(),
         ]);
         setCampaigns(campaignsData.slice(0, 5));
         setOrders(ordersData);
+        setOrdersByDay(ordersByDayData);
+        setUsersByDay(usersByDayData);
       } catch (error) {
         console.error("Failed to load dashboard data", error);
       } finally {
@@ -39,9 +46,58 @@ export default function DashboardPage() {
       }
     }
 
-    // The RouteGuard ensures a token exists, so we can always try to load data.
     loadDashboardData();
   }, [searchParams, router]);
+
+  const ordersChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Orders per day',
+      },
+    },
+  };
+
+  const usersChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'New users per day',
+      },
+    },
+  };
+
+  const ordersChartData = {
+    labels: ordersByDay.map(d => d.date),
+    datasets: [
+      {
+        label: 'Orders',
+        data: ordersByDay.map(d => d.count),
+        borderColor: 'rgb(53, 162, 235)',
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      },
+    ],
+  };
+
+  const usersChartData = {
+    labels: usersByDay.map(d => d.date),
+    datasets: [
+      {
+        label: 'Users',
+        data: usersByDay.map(d => d.count),
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+    ],
+  };
 
   return (
     <RouteGuard>
@@ -59,8 +115,15 @@ export default function DashboardPage() {
           {isLoading ? (
             <p>Loading dashboard...</p>
           ) : (
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Latest Campaigns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h2 className="text-2xl font-semibold mb-4">Orders in the last 30 days</h2>
+                <LineChart data={ordersChartData} options={ordersChartOptions} />
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h2 className="text-2xl font-semibold mb-4">New users in the last 30 days</h2>
+                <LineChart data={usersChartData} options={usersChartOptions} />
+              </div>
               <div>
                 <h2 className="text-2xl font-semibold mb-4">Latest Campaigns</h2>
                 <div className="space-y-4">
@@ -72,8 +135,6 @@ export default function DashboardPage() {
                   )) : <p className="text-gray-500">No campaigns found.</p>}
                 </div>
               </div>
-
-              {/* Latest Orders */}
               <div>
                 <h2 className="text-2xl font-semibold mb-4">Latest Orders</h2>
                 <div className="space-y-4">

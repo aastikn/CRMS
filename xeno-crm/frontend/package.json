@@ -4,5 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.0",
+    "react-chartjs-2": "^5.3.0"
   }
 }

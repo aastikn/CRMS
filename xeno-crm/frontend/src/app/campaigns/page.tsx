@@ -29,6 +29,20 @@ export default function CampaignsPage() {
         loadCampaigns();
     }, []);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const hasInProgressCampaigns = campaigns.some(c => c.status === 'IN_PROGRESS');
+            if (hasInProgressCampaigns) {
+                fetchCampaigns().then(data => {
+                    data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                    setCampaigns(data);
+                });
+            }
+        }, 5000); // Poll every 5 seconds
+
+        return () => clearInterval(interval);
+    }, [campaigns]);
+
     return (
         <div className="min-h-screen bg-gray-50 text-gray-800">
             <main className="max-w-4xl mx-auto p-8">

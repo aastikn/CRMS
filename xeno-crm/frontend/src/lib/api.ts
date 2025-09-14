@@ -1,4 +1,4 @@
-import { Audience, CampaignHistoryItem, Order, Customer, PaginatedResponse } from './types';
+import { Audience, CampaignHistoryItem, Order, Customer, PaginatedResponse, MessageSuggestion, AnalyticsDataPoint } from './types';
 
 const API_BASE_URL = '/api/v1';
 
@@ -118,6 +118,20 @@ export async function createCustomer(customer: Partial<Customer>): Promise<any> 
   return response.json();
 }
 
+export async function createCustomersBulk(customers: Partial<Customer>[]): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/customers/bulk`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(customers),
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Failed to import customers' }));
+    throw new Error(errorData.message);
+  }
+  return response.json();
+}
+
+// AI API
 export async function generateQueryFromPrompt(prompt: string): Promise<{ query: string }> {
   const response = await fetch(`${API_BASE_URL}/ai/generate-query`, {
     method: 'POST',
@@ -146,15 +160,17 @@ export async function generateMessagesFromObjective(objective: string): Promise<
   return result.data.messages;
 }
 
-export async function createCustomersBulk(customers: Partial<Customer>[]): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}/customers/bulk`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(customers),
-  });
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Failed to import customers' }));
-    throw new Error(errorData.message);
-  }
-  return response.json();
+// DASHBOARD API
+export async function fetchOrdersByDay(days: number = 30): Promise<AnalyticsDataPoint[]> {
+  const response = await fetch(`${API_BASE_URL}/dashboard/orders-by-day?days=${days}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Failed to fetch orders by day');
+  const result = await response.json();
+  return result.data;
+}
+
+export async function fetchUsersByDay(days: number = 30): Promise<AnalyticsDataPoint[]> {
+  const response = await fetch(`${API_BASE_URL}/dashboard/users-by-day?days=${days}`, { headers: getAuthHeaders() });
+  if (!response.ok) throw new Error('Failed to fetch users by day');
+  const result = await response.json();
+  return result.data;
 }

@@ -30,11 +30,17 @@ export type CampaignHistoryItem = {
   sentCount: number;
   failedCount: number;
   createdAt: string; // ISO date string
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
 };
 
 export type MessageSuggestion = {
   message: string;
   imageSuggestion: string;
+};
+
+export type AnalyticsDataPoint = {
+  date: string; // LocalDate from backend will be a string
+  count: number;
 };
 
 export type Order = {
