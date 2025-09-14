@@ -12,6 +12,8 @@ import {
   Legend,
 } from 'chart.js';
 
+import type { ChartData, ChartOptions } from 'chart.js';
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -22,6 +24,6 @@ ChartJS.register(
   Legend
 );
 
-export function LineChart({ data, options }: { data: any, options: any }) {
+export function LineChart({ data, options }: { data: ChartData<"line">, options: ChartOptions<"line"> }) {
   return <Line data={data} options={options} />;
 }

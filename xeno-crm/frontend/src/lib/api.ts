@@ -67,7 +67,7 @@ export async function fetchOrdersByCustomer(customerId: number): Promise<Order[]
   return result.data;
 }
 
-export async function createOrder(order: { customerId: number; orderAmount: number; orderDate: string; }): Promise<any> {
+export async function createOrder(order: { customerId: number; orderAmount: number; orderDate: string; }): Promise<Order> {
   const response = await fetch(`${API_BASE_URL}/orders`, {
     method: 'POST',
     headers: getAuthHeaders(),
@@ -97,7 +97,7 @@ export async function fetchCustomerById(id: number): Promise<Customer> {
   return result.data;
 }
 
-export async function searchCustomers(params: { [key: string]: any }): Promise<Customer[]> {
+export async function searchCustomers(params: { [key: string]: string }): Promise<Customer[]> {
   const query = new URLSearchParams(params).toString();
   const response = await fetch(`${API_BASE_URL}/customers/search?${query}`, { headers: getAuthHeaders() });
   if (!response.ok) throw new Error('Failed to search customers');
@@ -105,7 +105,7 @@ export async function searchCustomers(params: { [key: string]: any }): Promise<C
   return result.data;
 }
 
-export async function createCustomer(customer: Partial<Customer>): Promise<any> {
+export async function createCustomer(customer: Partial<Customer>): Promise<Customer> {
   const response = await fetch(`${API_BASE_URL}/customers`, {
     method: 'POST',
     headers: getAuthHeaders(),
@@ -118,7 +118,7 @@ export async function createCustomer(customer: Partial<Customer>): Promise<any> 
   return response.json();
 }
 
-export async function createCustomersBulk(customers: Partial<Customer>[]): Promise<any> {
+export async function createCustomersBulk(customers: Partial<Customer>[]): Promise<{ success: boolean; message: string }> {
   const response = await fetch(`${API_BASE_URL}/customers/bulk`, {
     method: 'POST',
     headers: getAuthHeaders(),
@@ -161,14 +161,14 @@ export async function generateMessagesFromObjective(objective: string): Promise<
 }
 
 // DASHBOARD API
-export async function fetchOrdersByDay(days: number = 30): Promise<AnalyticsDataPoint[]> {
+export async function fetchOrdersByDay(days = 30): Promise<AnalyticsDataPoint[]> {
   const response = await fetch(`${API_BASE_URL}/dashboard/orders-by-day?days=${days}`, { headers: getAuthHeaders() });
   if (!response.ok) throw new Error('Failed to fetch orders by day');
   const result = await response.json();
   return result.data;
 }
 
-export async function fetchUsersByDay(days: number = 30): Promise<AnalyticsDataPoint[]> {
+export async function fetchUsersByDay(days = 30): Promise<AnalyticsDataPoint[]> {
   const response = await fetch(`${API_BASE_URL}/dashboard/users-by-day?days=${days}`, { headers: getAuthHeaders() });
   if (!response.ok) throw new Error('Failed to fetch users by day');
   const result = await response.json();

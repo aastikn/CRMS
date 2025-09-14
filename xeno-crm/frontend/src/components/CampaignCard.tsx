@@ -26,7 +26,7 @@ export function CampaignCard({ campaign }: { campaign: CampaignHistoryItem }) {
             </div>
             <div className="mb-4">
                 <p className="text-sm text-gray-500">Message</p>
-                <p className="text-gray-800 text-lg italic">"{campaign.message}"</p>
+                <p className="text-gray-800 text-lg italic">&quot;{campaign.message}&quot;</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <Stat label="Audience" value={campaign.audienceSize.toLocaleString()} />

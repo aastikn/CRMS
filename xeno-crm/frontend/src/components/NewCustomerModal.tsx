@@ -21,7 +21,7 @@ export function NewCustomerModal({ isOpen, onClose, onSuccess }: Props) {
   const [phone, setPhone] = useState('');
 
   // CSV import state
-  const [csvFile, setCsvFile] = useState<File | null>(null);
+
   const [parsedCustomers, setParsedCustomers] = useState<Partial<Customer>[]>([]);
 
   const handleManualSubmit = async (e: React.FormEvent) => {
@@ -32,8 +32,12 @@ export function NewCustomerModal({ isOpen, onClose, onSuccess }: Props) {
       await createCustomer({ name, email, phone });
       onSuccess();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message || 'An error occurred.');
+      } else {
+        setError('An error occurred.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +46,6 @@ export function NewCustomerModal({ isOpen, onClose, onSuccess }: Props) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setCsvFile(file);
       parseCsv(file);
     }
   };
@@ -61,9 +64,8 @@ export function NewCustomerModal({ isOpen, onClose, onSuccess }: Props) {
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim());
         const customer = headers.reduce((obj, header, index) => {
-          // Simple mapping, assumes CSV headers match DTO fields (name, email, phone)
-          if (['name', 'email', 'phone'].includes(header)) {
-            (obj as any)[header] = values[index];
+          if (header === 'name' || header === 'email' || header === 'phone') {
+            obj[header] = values[index];
           }
           return obj;
         }, {} as Partial<Customer>);
@@ -86,8 +88,12 @@ export function NewCustomerModal({ isOpen, onClose, onSuccess }: Props) {
       await createCustomersBulk(parsedCustomers);
       onSuccess();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during import.');
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message || 'An error occurred during import.');
+      } else {
+        setError('An error occurred during import.');
+      }
     } finally {
       setIsLoading(false);
     }

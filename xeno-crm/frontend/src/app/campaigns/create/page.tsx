@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Audience, Rule, RuleGroup as RuleGroupType, MessageSuggestion } from '../../../lib/types';
-import { getAudienceSize, launchCampaign, generateMessagesFromObjective, generateQueryFromPrompt } from '../../../lib/api';
+import Image from 'next/image';
+import { Audience, MessageSuggestion } from '../../../lib/types';
+import { getAudienceSize, launchCampaign, generateMessagesFromObjective } from '../../../lib/api';
 import { GeminiQueryGenerator } from '../../../components/GeminiQueryGenerator';
 import { AudienceBuilder } from '../../../components/AudienceBuilder';
 
@@ -43,8 +44,12 @@ export default function CreateCampaignPage() {
         const payload = editorMode === 'visual' ? { audience } : { rawQuery };
         const data = await getAudienceSize(payload);
         setAudienceSize(data.count);
-    } catch (e: any) {
-        setError(e.message);
+    } catch (e) {
+        if (e instanceof Error) {
+            setError(e.message);
+        } else {
+            setError('An unexpected error occurred.');
+        }
     }
     setIsLoading(false);
   };
@@ -146,7 +151,7 @@ export default function CreateCampaignPage() {
                                     <p className="font-semibold">{suggestion.message}</p>
                                     {suggestion.imageSuggestion && (
                                         <div className="flex items-center mt-2 text-sm text-gray-600">
-                                            <img src={`https://placehold.co/40x40?text=${encodeURIComponent(suggestion.imageSuggestion)}`} alt="Image suggestion" className="w-10 h-10 rounded-md mr-2" />
+                                            <Image src={`https://placehold.co/40x40?text=${encodeURIComponent(suggestion.imageSuggestion)}`} alt="Image suggestion" width={40} height={40} className="rounded-md mr-2" />
                                             <span>Image Suggestion: {suggestion.imageSuggestion}</span>
                                         </div>
                                     )}

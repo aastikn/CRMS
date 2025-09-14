@@ -29,8 +29,12 @@ export function GeminiQueryGenerator({ onQueryGenerated }: Props) {
       try {
         const data = await generateQueryFromPrompt(prompt);
         onQueryGenerated(data.query);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError('An unexpected error occurred.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -43,7 +47,7 @@ export function GeminiQueryGenerator({ onQueryGenerated }: Props) {
       <h3 className="text-lg font-semibold text-blue-800 mb-2">Generate with AI</h3>
       <p className="text-sm text-gray-600 mb-4">
         Describe the audience you want to target in plain English, and AI will generate the query for you.
-        For example: "Customers who have spent more than $500 and visited in the last 30 days."
+        For example: &quot;Customers who have spent more than $500 and visited in the last 30 days.&quot;
       </p>
       <div className="flex items-center space-x-2">
         <input

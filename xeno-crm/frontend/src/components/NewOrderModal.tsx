@@ -44,8 +44,12 @@ export function NewOrderModal({ isOpen, onClose, onSuccess }: Props) {
       });
       onSuccess();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message || 'An error occurred.');
+      } else {
+        setError('An error occurred.');
+      }
     } finally {
       setIsLoading(false);
     }

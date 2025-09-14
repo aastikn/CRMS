@@ -41,7 +41,7 @@ export default function CustomersPage() {
     const activeFilters = Object.entries(currentFilters).reduce((acc, [key, value]) => {
       if (value) acc[key] = value;
       return acc;
-    }, {} as { [key: string]: any });
+    }, {} as { [key: string]: string });
 
     if (Object.keys(activeFilters).length > 0) {
       setIsSearching(true);
