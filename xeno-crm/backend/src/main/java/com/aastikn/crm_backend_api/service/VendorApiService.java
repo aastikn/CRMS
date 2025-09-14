@@ -19,7 +19,8 @@ public class VendorApiService {
         log.info("VENDOR_API_SIM: Sending message to {}: '{}'", communicationLog.getCustomer().getEmail(), personalizedMessage);
 
         // Simulate success/failure (~90% SENT, ~10% FAILED) [cite: 33]
-        String status = Math.random() < 0.9 ? "SENT" : "FAILED";
+//        String status = Math.random() < 0.9 ? "SENT" : "FAILED";
+        String status = "SENT";
 
         DeliveryReceiptDto receipt = new DeliveryReceiptDto(communicationLog.getId(), status);
 

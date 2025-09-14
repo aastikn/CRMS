@@ -54,6 +54,6 @@ public class CampaignService {
     }
 
     public List<Campaign> getAllCampaigns() {
-        return campaignRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        return campaignRepository.findAllWithSegment();
     }
 }

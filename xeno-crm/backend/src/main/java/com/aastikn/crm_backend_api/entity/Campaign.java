@@ -1,5 +1,6 @@
 package com.aastikn.crm_backend_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class Campaign {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "segment_id", referencedColumnName = "id")
+    @JsonIgnore
     private Segment segment;
 
     @Lob

@@ -33,7 +33,9 @@ public class ReceiptUpdateConsumer implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
+            // Deserialize the message body from bytes into our DTO
             DeliveryReceiptDto receipt = objectMapper.readValue(message.getBody(), DeliveryReceiptDto.class);
+            // Add the deserialized receipt to the queue for batch processing
             receiptQueue.add(receipt);
         } catch (IOException e) {
             log.error("Error deserializing receipt message", e);

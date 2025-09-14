@@ -43,6 +43,7 @@ public class CampaignDeliveryConsumer implements MessageListener {
             campaignRepository.save(campaign);
             log.info("calling vendor service to send onmessage cdc");
             // 2. Create logs and call vendor for each customer
+//            log.info("savedLog for first is {}, and cgm is {}",audience.stream().findFirst());
             for (Customer customer : audience) {
                 CommunicationLog log = new CommunicationLog();
                 log.setCampaign(campaign);
@@ -50,6 +51,7 @@ public class CampaignDeliveryConsumer implements MessageListener {
                 log.setStatus(CommunicationLog.Status.PENDING);
                 CommunicationLog savedLog = communicationLogRepository.save(log);
                 // 3. Simulate sending the message via the vendor
+
                 vendorApiService.sendMessage(savedLog, campaign.getMessage());
             }
 
