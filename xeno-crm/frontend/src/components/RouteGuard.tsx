@@ -1,24 +1,36 @@
+
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+
+const unprotectedRoutes = ['/'];
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const tokenFromStorage = localStorage.getItem('jwt_token');
     const tokenFromUrl = searchParams.get('token');
-
-    if (tokenFromStorage || tokenFromUrl) {
-      setIsAuthenticated(true);
-    } else {
-      router.push('/');
+    if (tokenFromUrl) {
+      localStorage.setItem('jwt_token', tokenFromUrl);
+      // Clean the URL
+      window.history.replaceState(null, '', pathname);
     }
-  }, [router, searchParams]);
 
-  // Render children only when authenticated. A loading spinner could be returned here.
-  return isAuthenticated ? <>{children}</> : null;
+    const token = localStorage.getItem('jwt_token');
+    const isProtected = !unprotectedRoutes.includes(pathname);
+
+    if (token) {
+      setIsLoggedIn(true);
+    } else if (isProtected) {
+      router.push('/');
+    } else {
+      setIsLoggedIn(true); // Allow access to unprotected routes
+    }
+  }, [pathname, router, searchParams]);
+
+  return isLoggedIn ? <>{children}</> : null;
 }

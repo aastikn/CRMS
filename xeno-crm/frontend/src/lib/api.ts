@@ -1,4 +1,4 @@
-import { Audience, CampaignHistoryItem, Order, Customer, PaginatedResponse, MessageSuggestion, AnalyticsDataPoint } from './types';
+import { Audience, CampaignHistoryItem, Order, Customer, PaginatedResponse, MessageSuggestion, AnalyticsDataPoint, CommunicationLog } from './types';
 
 const API_BASE_URL = '/api/v1';
 
@@ -44,14 +44,6 @@ export async function fetchCampaigns(): Promise<CampaignHistoryItem[]> {
 }
 
 // LOGS API
-export async function fetchCommunicationLogs(page: number, size: number): Promise<PaginatedResponse<CommunicationLog>> {
-  const query = new URLSearchParams({ page: String(page), size: String(size), sort: 'createdAt,desc' }).toString();
-  const response = await fetch(`${API_BASE_URL}/logs?${query}`, { headers: getAuthHeaders() });
-  if (!response.ok) throw new Error('Failed to fetch communication logs');
-  const result = await response.json();
-  return result.data;
-}
-
 
 export async function getCommunicationLogs(): Promise<CommunicationLog[]> {
   const response = await fetch(`${API_BASE_URL}/logs/all`, { headers: getAuthHeaders() });
