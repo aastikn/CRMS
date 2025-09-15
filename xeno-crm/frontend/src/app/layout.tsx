@@ -8,6 +8,7 @@ export const metadata = {
 
 import { Suspense } from 'react';
 import { RouteGuard } from '../components/RouteGuard';
+import { Providers } from '../components/providers';
 
 export default function RootLayout({
   children,
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        <Suspense fallback={<div>Loading...</div>}>
-          <RouteGuard>{children}</RouteGuard>
-        </Suspense>
+        <Providers>
+          <Header />
+          <Suspense fallback={<div>Loading...</div>}>
+            <RouteGuard>{children}</RouteGuard>
+          </Suspense>
+        </Providers>
       </body>
     </html>
   );
