@@ -2,7 +2,9 @@
   "name": "@xeno-crm/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "nx build frontend"
+  },
   "private": true,
   "devDependencies": {
     "@eslint/compat": "^1.1.1",

@@ -1,0 +1,5 @@
+{
+  "workspaces": {
+    "packages": ["xeno-crm/frontend"]
+  }
+}

@@ -18,6 +18,8 @@
     "src/**/*.test.ts"
   ],
   "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "noEmit": true,
     "incremental": true,

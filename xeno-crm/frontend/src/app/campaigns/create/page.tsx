@@ -56,7 +56,9 @@ export default function CreateCampaignPage() {
 
   const handleLaunch = async () => {
     if (!campaignName) {
-      alert('Please enter a campaign name.');
+      if (typeof window !== 'undefined') {
+        alert('Please enter a campaign name.');
+      }
       return;
     }
     if (!campaignMessage) {
