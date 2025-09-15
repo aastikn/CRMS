@@ -1,6 +1,6 @@
 services:
   app:
-    build: xeno-crm/backend # Assumes your backend is in this folder
+    build: ./xeno-crm/backend # Assumes your backend is in this folder
     ports:
       - "8080:8080"
 #    depends_on:
