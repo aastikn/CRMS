@@ -1,9 +1,0 @@
-{
-  "packages": ["xeno-crm/frontend"],
-  "build": {
-    "env": {
-      "NX_SKIP_NX_CACHE": "1"
-    }
-  },
-  "buildCommand": "pnpm exec nx build frontend"
-}
