@@ -7,7 +7,7 @@ services:
 #      - db
 #      - redis
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://34.93.74.186:3306/crm_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=${MYSQL_URL}
       - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
       - SPRING_REDIS_HOST=${REDIS_HOST}
