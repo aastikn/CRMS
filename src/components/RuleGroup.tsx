@@ -13,8 +13,8 @@ type RuleGroupProps = {
 
 export function RuleGroup({ group, onUpdateRule, onRemoveRule, onAddRule, onConjunctionChange }: RuleGroupProps) {
   return (
-    <div className="space-y-4 p-4 border border-gray-200 rounded-lg">
-      <div className="space-y-3">
+    <div className="space-y-4">
+      <div className="space-y-4">
         {group.rules.map((rule, index) => (
           <div key={rule.id}>
             <Rule
@@ -23,16 +23,16 @@ export function RuleGroup({ group, onUpdateRule, onRemoveRule, onAddRule, onConj
               onRemove={onRemoveRule}
             />
             {index < group.rules.length - 1 && (
-              <div className="flex justify-center my-2">
-                  <div className="flex rounded-md bg-gray-100 p-1">
+              <div className="flex justify-center my-4">
+                  <div className="flex rounded-lg bg-gray-200 p-1">
                       <button 
                           onClick={() => onConjunctionChange(index, 'AND')} 
-                          className={`px-3 py-1 text-sm font-semibold rounded-md ${group.conjunctions[index] === 'AND' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}>
+                          className={`px-3 py-1 text-sm font-bold rounded-md ${group.conjunctions[index] === 'AND' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600'}`}>
                           AND
                       </button>
                       <button 
                           onClick={() => onConjunctionChange(index, 'OR')} 
-                          className={`px-3 py-1 text-sm font-semibold rounded-md ${group.conjunctions[index] === 'OR' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}>
+                          className={`px-3 py-1 text-sm font-bold rounded-md ${group.conjunctions[index] === 'OR' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600'}`}>
                           OR
                       </button>
                   </div>
@@ -43,7 +43,7 @@ export function RuleGroup({ group, onUpdateRule, onRemoveRule, onAddRule, onConj
       </div>
       <button
         onClick={onAddRule}
-        className="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 mt-4"
+        className="w-full px-4 py-2 bg-indigo-100 text-indigo-800 font-semibold rounded-lg hover:bg-indigo-200 transition-all"
       >
         + Add Rule
       </button>

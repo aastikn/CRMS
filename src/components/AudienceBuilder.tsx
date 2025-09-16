@@ -37,25 +37,25 @@ export function AudienceBuilder({ audience, setAudience }: AudienceBuilderProps)
   };
 
   return (
-    <div className="space-y-6 p-4 border border-dashed border-gray-300 rounded-lg">
-      <div className="flex items-center space-x-2">
-        <span className="text-lg font-semibold">Combine rule groups with:</span>
-        <div className="flex rounded-md bg-gray-200 p-1">
+    <div className="space-y-6 p-6 bg-gray-50 border border-gray-200 rounded-lg">
+      <div className="flex items-center space-x-4">
+        <span className="text-lg font-semibold text-gray-700">Combine rule groups with:</span>
+        <div className="flex rounded-lg bg-gray-200 p-1">
           <button 
             onClick={() => handleMasterConjunctionChange('AND')} 
-            className={`px-4 py-1 text-sm font-bold rounded-md ${audience.conjunction === 'AND' ? 'bg-green-600 text-white' : 'text-gray-700'}`}>
+            className={`px-4 py-2 text-sm font-bold rounded-md ${audience.conjunction === 'AND' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700'}`}>
             AND
           </button>
           <button 
             onClick={() => handleMasterConjunctionChange('OR')} 
-            className={`px-4 py-1 text-sm font-bold rounded-md ${audience.conjunction === 'OR' ? 'bg-green-600 text-white' : 'text-gray-700'}`}>
+            className={`px-4 py-2 text-sm font-bold rounded-md ${audience.conjunction === 'OR' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700'}`}>
             OR
           </button>
         </div>
       </div>
 
-      <div className="space-y-4">
-        {audience.groups.map((group) => {
+      <div className="space-y-6">
+        {audience.groups.map((group, index) => {
           const handleAddRule = () => {
             const newRule: Rule = { id: generateId(), field: 'total_spending', operator: 'gt', value: 0 };
             const newConjunctions = [...group.conjunctions];
@@ -91,17 +91,24 @@ export function AudienceBuilder({ audience, setAudience }: AudienceBuilderProps)
           };
 
           return (
-            <div key={group.id} className="relative pl-4">
-                <RuleGroup
-                    group={group}
-                    onAddRule={handleAddRule}
-                    onUpdateRule={handleUpdateRule}
-                    onRemoveRule={handleRemoveRule}
-                    onConjunctionChange={handleConjunctionChange}
-                />
-                {audience.groups.length > 1 && (
-                    <button onClick={() => handleRemoveGroup(group.id)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold">&times;</button>
+            <div key={group.id} className="relative">
+                {index > 0 && (
+                    <div className="flex justify-center my-4">
+                        <span className="text-sm font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-full">{audience.conjunction}</span>
+                    </div>
                 )}
+                <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <RuleGroup
+                        group={group}
+                        onAddRule={handleAddRule}
+                        onUpdateRule={handleUpdateRule}
+                        onRemoveRule={handleRemoveRule}
+                        onConjunctionChange={handleConjunctionChange}
+                    />
+                    {audience.groups.length > 1 && (
+                        <button onClick={() => handleRemoveGroup(group.id)} className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold text-lg hover:bg-red-600 transition-transform transform hover:scale-110">&times;</button>
+                    )}
+                </div>
             </div>
           )
         })}
@@ -109,7 +116,7 @@ export function AudienceBuilder({ audience, setAudience }: AudienceBuilderProps)
 
       <button
         onClick={handleAddGroup}
-        className="px-4 py-2 bg-blue-100 text-blue-800 font-semibold rounded-md hover:bg-blue-200"
+        className="w-full px-6 py-3 bg-indigo-100 text-indigo-800 font-bold rounded-lg hover:bg-indigo-200 transition-all"
       >
         + Add Rule Group
       </button>

@@ -41,11 +41,11 @@ export function Rule({ rule, onUpdate, onRemove }: RuleProps) {
   }
 
   return (
-    <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-md border">
+    <div className="grid grid-cols-1 md:grid-cols-[2fr_2fr_1fr_auto] gap-3 items-center">
       <select
         value={rule.field}
         onChange={(e) => onUpdate(rule.id, { field: e.target.value as RuleType['field'] })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
       >
         {FIELD_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -57,7 +57,7 @@ export function Rule({ rule, onUpdate, onRemove }: RuleProps) {
       <select
         value={rule.operator}
         onChange={(e) => onUpdate(rule.id, { operator: e.target.value as RuleType['operator'] })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
       >
         {availableOperators.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -66,22 +66,22 @@ export function Rule({ rule, onUpdate, onRemove }: RuleProps) {
         ))}
       </select>
 
-      <div className="flex items-center flex-grow">
+      <div className="flex items-center">
         <input
           type="number"
           value={rule.value}
           onChange={(e) => onUpdate(rule.id, { value: Number(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
           placeholder="Value"
         />
-        {rule.field === 'last_visit_days_ago' && <span className="ml-2 text-gray-600">days</span>}
+        {rule.field === 'last_visit_days_ago' && <span className="ml-2 text-gray-600 font-medium">days</span>}
       </div>
 
       <button
         onClick={() => onRemove(rule.id)}
-        className="px-3 py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600"
+        className="px-3 py-3 bg-red-100 text-red-700 font-bold rounded-lg hover:bg-red-200 transition-colors"
       >
-        Remove
+        &times;
       </button>
     </div>
   );
