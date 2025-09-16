@@ -22,7 +22,7 @@ const nextConfig = {
     return [
       {
         source: '/api/v1/:path*',
-        destination: 'http://34.100.252.132:8080/api/v1/:path*',
+        destination: 'http://caseforge.me:8080/api/v1/:path*',
       },
     ];
   },
